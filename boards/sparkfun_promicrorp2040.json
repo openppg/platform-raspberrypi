@@ -22,7 +22,7 @@
       ]
     ],
     "mcu": "rp2040",
-    "variant": "openppg_crp2040"
+    "variant": "sparkfun_promicrorp2040"
   },
   "debug": {
     "jlink_device": "RP2040_M0_0",
