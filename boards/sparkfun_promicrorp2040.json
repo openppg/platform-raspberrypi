@@ -22,7 +22,7 @@
       ]
     ],
     "mcu": "rp2040",
-    "variant": "sparkfun_promicrorp2040"
+    "variant": "openppg_crp2040"
   },
   "debug": {
     "jlink_device": "RP2040_M0_0",
@@ -32,7 +32,7 @@
   "frameworks": [
     "arduino"
   ],
-  "name": "ProMicro RP2040",
+  "name": "OpenPPG Controller RP2040",
   "upload": {
     "maximum_ram_size": 270336,
     "maximum_size": 16777216,
@@ -50,5 +50,5 @@
     ]
   },
   "url": "https://www.raspberrypi.org/products/raspberry-pi-pico/",
-  "vendor": "SparkFun"
+  "vendor": "OpenPPG"
 }
