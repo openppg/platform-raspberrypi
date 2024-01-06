@@ -18,7 +18,7 @@
     "type": "git",
     "url": "https://github.com/platformio/platform-raspberrypi.git"
   },
-  "version": "1.9.0",
+  "version": "1.10.0",
   "frameworks": {
     "arduino": {
       "package": "framework-arduino-mbed",
@@ -41,13 +41,13 @@
       "type": "framework",
       "optional": true,
       "owner": "platformio",
-      "version": "~4.0.2"
+      "version": "~4.0.6"
     },
     "framework-arduinopico": {
       "type": "framework",
       "optional": true,
       "owner": "earlephilhower",
-      "version": "https://github.com/earlephilhower/arduino-pico.git#3950b944748950756fcf89576eefb6f08b7aea09"
+      "version": "https://github.com/earlephilhower/arduino-pico.git#c3a3526aada769c800a30e985553f1523be8c413"
     },
     "tool-rp2040tools": {
       "type": "uploader",
@@ -64,7 +64,7 @@
       "type": "uploader",
       "optional": true,
       "owner": "platformio",
-      "version": "^1.72000.0"
+      "version": "^1.78811.0"
     },
     "tool-mklittlefs-rp2040-earlephilhower": {
       "type": "uploader",
