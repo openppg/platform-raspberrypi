@@ -47,7 +47,7 @@
       "type": "framework",
       "optional": true,
       "owner": "earlephilhower",
-      "version": "https://github.com/earlephilhower/arduino-pico.git#88ccf0c256dc717ff932adc9e2d84485214bf2e5"
+      "version": "https://github.com/earlephilhower/arduino-pico.git#d554df76706faade5196f68e668ec9d9bf21b6fe"
     },
     "tool-rp2040tools": {
       "type": "uploader",
