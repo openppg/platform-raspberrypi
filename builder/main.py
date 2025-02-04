@@ -111,6 +111,24 @@ def get_num_rpxxxx_devs(picotool_path: str):
     output = subprocess.run('"' + picotool_path + '" info -d', check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True).stdout
     return output.count(b"type:")
 
+def get_serial_ports_by_serial_number(serial_number):
+    serial_ports = []
+    ports = list_serial_ports(as_objects=True)
+
+    for port in ports:
+        if port.serial_number == serial_number:
+            serial_ports.append(port.device)
+
+    return serial_ports
+
+SERIAL_NUMBER_PREFIX = "SER="
+
+def get_serial_number(port_id):
+    if not port_id or not port_id.startswith(SERIAL_NUMBER_PREFIX):
+        return None
+
+    return port_id[len(SERIAL_NUMBER_PREFIX):]
+
 def BeforeUpload(target, source, env):  # pylint: disable=W0613,W0621
     upload_options = {}
     if "BOARD" in env:
@@ -125,7 +143,21 @@ def BeforeUpload(target, source, env):  # pylint: disable=W0613,W0621
             print("Already found " + str(num_now) + " device(s) RPxxxx device in BOOTSEL mode, not trying to do 1200bps reset.")
             return
 
-    env.AutodetectUploadPort()
+    potential_serial_number = get_serial_number(env.subst("$UPLOAD_PORT"))
+
+    if potential_serial_number:
+        print("Serial number " + potential_serial_number + " specified instead of a port, will search for associated serial ports.")
+        associated_ports = get_serial_ports_by_serial_number(potential_serial_number)
+        print("Serial ports found for device with serial number " + potential_serial_number + ": " + ("[none]" if not associated_ports else ", ".join(associated_ports)))
+
+        if len(associated_ports) != 1:
+            print("Failed to find exactly one port associated with the given serial number. Falling back to autodetection.")
+            env.AutodetectUploadPort()
+        else:
+            env.Replace(UPLOAD_PORT=associated_ports[0])
+    else:
+        env.AutodetectUploadPort()
+
     before_ports = list_serial_ports()
 
     if upload_options.get("use_1200bps_touch", False):
