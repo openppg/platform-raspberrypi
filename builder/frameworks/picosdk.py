@@ -72,7 +72,10 @@ env.Append(
         join(FRAMEWORK_DIR, "generated"),
         # this is 'genned_dir', but late-evaluated
         "$PROJECT_BUILD_DIR/$PIOENV/generated",
-
+        
+        # Boards Directory
+        join(FRAMEWORK_DIR, "src", "boards", "include"),
+        
         # Common for all (host, rp2040, rp2350)
         join(FRAMEWORK_DIR, "src", "common", "boot_picobin_headers", "include"),
         join(FRAMEWORK_DIR, "src", "common", "boot_picoboot_headers", "include"),
