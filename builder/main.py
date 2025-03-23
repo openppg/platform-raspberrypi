@@ -14,11 +14,13 @@
 
 import sys
 from platform import system
-from os import makedirs, remove
-from os.path import isdir, join, isfile
+from os import makedirs, remove, environ
+from os.path import isdir, join, isfile, exists
 import re
 import time
 from shutil import copyfile
+import subprocess
+from platformio.proc import exec_command
 
 from platformio.public import list_serial_ports
 
@@ -67,6 +69,9 @@ def fetch_fs_size(env):
     print("Flash size: %.2fMB" % (flash_size / 1024.0 / 1024.0))
     print("Sketch size: %.2fMB" % (maximum_sketch_size / 1024.0 / 1024.0))
     print("Filesystem size: %.2fMB" % (filesystem_size_int / 1024.0 / 1024.0))
+    # Just informational
+    psram_len = convert_size_expression_to_int(str(board.get("upload.psram_length", "0")))
+    print("PSRAM size: %.2fMB" % (psram_len / 1024.0 / 1024.0))
 
     eeprom_start = 0x10000000 + flash_size - eeprom_size
     fs_start = 0x10000000 + flash_size - eeprom_size - filesystem_size_int
@@ -100,16 +105,77 @@ def __fetch_fs_size(target, source, env):
     fetch_fs_size(env)
     return (target, source)
 
+def get_num_rpxxxx_devs(picotool_path: str):
+    # regardless of whether an RP2040 or RP2350 device is deteced, it will print "type: [..] RP2350" or "type: [..] RP2040".
+    # else it will not print "type:".
+    output = subprocess.run('"' + picotool_path + '" info -d', check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True).stdout
+    return output.count(b"type:")
+
+def get_serial_ports_by_serial_number(serial_number):
+    serial_ports = []
+    ports = list_serial_ports(as_objects=True)
+
+    for port in ports:
+        if port.serial_number == serial_number:
+            serial_ports.append(port.device)
+
+    return serial_ports
+
+SERIAL_NUMBER_PREFIX = "SER="
+
+def get_serial_number(port_id):
+    if not port_id or not port_id.startswith(SERIAL_NUMBER_PREFIX):
+        return None
+
+    return port_id[len(SERIAL_NUMBER_PREFIX):]
+
 def BeforeUpload(target, source, env):  # pylint: disable=W0613,W0621
     upload_options = {}
     if "BOARD" in env:
         upload_options = env.BoardConfig().get("upload", {})
 
-    env.AutodetectUploadPort()
+    # fastpath if device is already in BOOTSEL mode. We don't need to do anything.
+    upload_protocol = env.subst("$UPLOAD_PROTOCOL") or "picotool"
+    if upload_protocol == "picotool" and upload_options.get("use_1200bps_touch", False) is True:
+        picotool_path = join(env.PioPlatform().get_package_dir("tool-picotool-rp2040-earlephilhower") or "", "picotool")
+        num_now = get_num_rpxxxx_devs(picotool_path) 
+        if get_num_rpxxxx_devs(picotool_path) != 0:
+            print("Already found " + str(num_now) + " device(s) RPxxxx device in BOOTSEL mode, not trying to do 1200bps reset.")
+            return
+
+    potential_serial_number = get_serial_number(env.subst("$UPLOAD_PORT"))
+
+    if potential_serial_number:
+        print("Serial number " + potential_serial_number + " specified instead of a port, will search for associated serial ports.")
+        associated_ports = get_serial_ports_by_serial_number(potential_serial_number)
+        print("Serial ports found for device with serial number " + potential_serial_number + ": " + ("[none]" if not associated_ports else ", ".join(associated_ports)))
+
+        if len(associated_ports) != 1:
+            print("Failed to find exactly one port associated with the given serial number. Falling back to autodetection.")
+            env.AutodetectUploadPort()
+        else:
+            env.Replace(UPLOAD_PORT=associated_ports[0])
+    else:
+        env.AutodetectUploadPort()
+
     before_ports = list_serial_ports()
 
     if upload_options.get("use_1200bps_touch", False):
+        picotool_path = join(env.PioPlatform().get_package_dir("tool-picotool-rp2040-earlephilhower") or "", "picotool")
+        num_before = get_num_rpxxxx_devs(picotool_path)
         env.TouchSerialPort("$UPLOAD_PORT", 1200)
+        # delay a tiny bit in any case
+        time.sleep(0.2)
+        max_wait_s = 3.0
+        while max_wait_s > 0:
+            if get_num_rpxxxx_devs(picotool_path) > num_before:
+                print("Device rebooted into BOOTSEL mode successfully.")
+                break
+            time.sleep(0.25)
+            max_wait_s -= 0.25
+            print("No new RPxxxx device found yet, waiting..")
+        if get_num_rpxxxx_devs(picotool_path) == 0:
+            print("Warning: Picotool did not detect any RPxxxx devices in BOOTSEL mode. Upload might fail.")
 
     if upload_options.get("wait_for_upload_port", False):
         env.Replace(UPLOAD_PORT=env.WaitForNewSerialPort(before_ports))
@@ -120,9 +186,13 @@ def generate_uf2(target, source, env):
     env.Execute(
         " ".join(
             [
-                "elf2uf2",
+                "picotool",
+                "uf2",
+                "convert",
+                "-t",
+                "elf",
                 '"%s"' % elf_file,
-                '"%s"' % elf_file.replace(".elf", ".uf2"),
+                '"%s"' % elf_file.replace(".elf", ".uf2")
             ]
         )
     )
@@ -131,18 +201,23 @@ def generate_uf2(target, source, env):
 env = DefaultEnvironment()
 platform = env.PioPlatform()
 board = env.BoardConfig()
+chip = board.get("build.mcu")
+
+toolchain_tripple = "arm-none-eabi"
+if chip == "rp2350-riscv":
+    toolchain_tripple = "riscv32-unknown-elf"
 
 env.Replace(
     __fetch_fs_size=fetch_fs_size,
 
-    AR="arm-none-eabi-ar",
-    AS="arm-none-eabi-as",
-    CC="arm-none-eabi-gcc",
-    CXX="arm-none-eabi-g++",
-    GDB="arm-none-eabi-gdb",
-    OBJCOPY="arm-none-eabi-objcopy",
-    RANLIB="arm-none-eabi-ranlib",
-    SIZETOOL="arm-none-eabi-size",
+    AR="%s-ar" % toolchain_tripple,
+    AS="%s-as" % toolchain_tripple,
+    CC="%s-gcc" % toolchain_tripple,
+    CXX="%s-g++" % toolchain_tripple,
+    GDB="%s-gdb" % toolchain_tripple,
+    OBJCOPY="%s-objcopy" % toolchain_tripple,
+    RANLIB="%s-ranlib" % toolchain_tripple,
+    SIZETOOL="%s-size" % toolchain_tripple,
 
     ARFLAGS=["rc"],
 
@@ -156,6 +231,55 @@ env.Replace(
 
     PROGSUFFIX=".elf"
 )
+
+# Print fancier PSRAM size output (statically known allocations)
+def _format_available_bytes(value, total):
+    percent_raw = float(value) / float(total)
+    blocks_per_progress = 10
+    used_blocks = min(
+        int(round(blocks_per_progress * percent_raw)), blocks_per_progress
+    )
+    return "[{:{}}] {: 6.1%} (used {:d} bytes from {:d} bytes)".format(
+        "=" * used_blocks, blocks_per_progress, percent_raw, value, total
+    )
+def _get_size_output(source):
+    cmd = env.get("SIZECHECKCMD")
+    if not cmd:
+        return None
+    if not isinstance(cmd, list):
+        cmd = cmd.split()
+    cmd = [arg.replace("$SOURCES", str(source[0])) for arg in cmd if arg]
+    sysenv = environ.copy()
+    sysenv["PATH"] = str(env["ENV"]["PATH"])
+    result = exec_command(env.subst(cmd), env=sysenv)
+    if result["returncode"] != 0:
+        return None
+    return result["out"].strip()
+def _calculate_size(output, pattern):
+    if not output or not pattern:
+        return -1
+    size = 0
+    regexp = re.compile(pattern)
+    for line in output.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        match = regexp.search(line)
+        if not match:
+            continue
+        size += sum(int(value) for value in match.groups())
+    return size
+old_check = env.CheckUploadSize
+def new_check_size(target, source, env):
+    old_check(target, source, env)
+    board = env.BoardConfig()
+    psram_len = convert_size_expression_to_int(str(board.get("upload.psram_length", "0")))
+    if psram_len == 0:
+        return
+    output = _get_size_output(source)
+    used_psram = _calculate_size(output, r"^(?:\.psram)\s+(\d+).*")
+    print("PSRAM: " + _format_available_bytes(used_psram, psram_len))
+env.CheckUploadSize = new_check_size
 
 # Allow user to override via pre:script
 if env.get("PROGNAME", "program") == "program":
@@ -257,7 +381,9 @@ else:
         AlwaysBuild(target_firm)
     else:
         target_firm = env.ElfToBin(join("$BUILD_DIR", "${PROGNAME}"), target_elf)
-        if is_arduino_pico_build:
+        signing_script_exists = exists(join(platform.get_package_dir("framework-arduinopico") or "",
+            "tools", "signing.py"))
+        if is_arduino_pico_build and signing_script_exists:
             target_signed_bin = env.BinToSignedBin(join("$BUILD_DIR", "${PROGNAME}"), target_firm)
             env.Depends(target_signed_bin, "checkprogsize")
         env.Depends(target_firm, "checkprogsize")
@@ -295,7 +421,7 @@ def RebootPico(target, source, env):
     time.sleep(0.5)
     env.Execute(
         '"%s" reboot' %
-            join(platform.get_package_dir("tool-rp2040tools") or "", "picotool")
+            join(platform.get_package_dir("tool-picotool-rp2040-earlephilhower") or "", "picotool")
     )
 #
 # Target: Upload by default .bin file
@@ -430,14 +556,14 @@ elif upload_protocol == "espota":
     upload_actions = [env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE")]
 elif upload_protocol == "picotool":
     env.Replace(
-        UPLOADER=join(platform.get_package_dir("tool-rp2040tools") or "", "rp2040load"),
-        UPLOADERFLAGS=["-v", "-D"],
-        UPLOADCMD='"$UPLOADER" $UPLOADERFLAGS $SOURCES'
+        UPLOADER=join(platform.get_package_dir("tool-picotool-rp2040-earlephilhower") or "", "picotool"),
+        UPLOADERFLAGS=["-v", "-x"],
+        UPLOADCMD='"$UPLOADER" load $UPLOADERFLAGS $SOURCES'
     )
 
     if "uploadfs" in COMMAND_LINE_TARGETS:
         env.Replace(
-            UPLOADER=join(platform.get_package_dir("tool-rp2040tools") or "", "picotool"),
+            UPLOADER=join(platform.get_package_dir("tool-picotool-rp2040-earlephilhower") or "", "picotool"),
             UPLOADERFLAGS=[
                 "load",
                 "--verify"
@@ -450,10 +576,7 @@ elif upload_protocol == "picotool":
         env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"),
     ]
 
-    # picotool seems to need just a tiny bit of delay, but rp2040 load not..
     if "uploadfs" in COMMAND_LINE_TARGETS:
-        upload_actions.insert(1, env.VerboseAction(
-            lambda source, target, env: time.sleep(0.5), "Delaying a tiny bit..."))
         # reboot after filesystem upload
         upload_actions.append(env.VerboseAction(RebootPico, "Rebooting device..."))
 
@@ -500,9 +623,9 @@ elif upload_protocol in debug_tools:
     ]
     openocd_args.extend(
         debug_tools.get(upload_protocol).get("server").get("arguments", []))
-    # always use a default speed directive of 1000khz or an otherwise configured speed
+    # always use a default speed directive of 5000khz or an otherwise configured speed
     # otherwise, flash failures were observed
-    speed = env.GetProjectOption("debug_speed") or "1000"
+    speed = env.GetProjectOption("debug_speed") or "5000"
     openocd_args.extend(
         ["-c", "adapter speed %s" % speed]
     )

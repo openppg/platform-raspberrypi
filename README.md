@@ -1,8 +1,22 @@
-# Raspberry Pi RP2040: development platform for [PlatformIO](https://platformio.org)
+# Fork of Platformio Raspberry Pi RP2040: development platform for [PlatformIO](https://platformio.org)
 
 [![Build Status](https://github.com/platformio/platform-raspberrypi/workflows/Examples/badge.svg)](https://github.com/platformio/platform-raspberrypi/actions)
 
-RP2040 is a low-cost, high-performance microcontroller device with a large on-chip memory, symmetric dual-core processor complex, deterministic bus fabric, and rich peripheral set augmented with a unique Programmable I/O (PIO) subsystem, it provides professional users with unrivalled power and flexibility.
+> [!NOTE]  
+> This fork was created due to the lack of ongoing upstream development of the Raspberry Pi RP2040 and RP2350 Arduino Core for PlatformIO.
+>
+> For additional information, please refer to these GitHub links:
+> 
+> - https://github.com/platformio/platform-raspberrypi/pull/36
+> - https://github.com/platformio/platform-raspberrypi/pull/70
+> - https://github.com/platformio/platform-raspberrypi/issues/67
+>
+> Those discussions are more or less self-explanatory, allowing you to draw your own conclusions, but feel free to post comments in those.
+
+
+RP2040 is a low-cost, high-performance microcontroller device with a large on-chip memory, symmetric dual-core processor complex, deterministic bus fabric, and rich peripheral set augmented with a unique Programmable I/O (PIO) subsystem, it provides professional users with unrivalled power and flexibility. RP2040 was initially released as part of the Raspberry Pi Pico board.
+
+RP2350 microcontroller is the successor to RP2040, and it contains two 32-bit ARM Cortex-M33 cores and two Hazard3 RISC-V cores. RP2350 was initially released as part of the Raspberry Pi Pico 2 board.
 
 * [Home](https://registry.platformio.org/platforms/platformio/raspberrypi) (home page in the PlatformIO Registry)
 * [Documentation](https://docs.platformio.org/page/platforms/raspberrypi.html) (advanced usage, packages, boards, frameworks, etc.)
@@ -10,7 +24,8 @@ RP2040 is a low-cost, high-performance microcontroller device with a large on-ch
 # Usage
 
 1. [Install PlatformIO](https://platformio.org)
-2. Create PlatformIO project and configure a platform option in [platformio.ini](https://docs.platformio.org/page/projectconf.html) file:
+2. **Enable Win32 NTFS Long Paths** if on Windows. Otherwise, the installation of the package files for Arduino-Pico **will** fail. See https://arduino-pico.readthedocs.io/en/latest/platformio.html#important-steps-for-windows-users-before-installing.
+3. Create PlatformIO project and configure a platform option in [platformio.ini](https://docs.platformio.org/page/projectconf.html) file:
 
 ## Stable version
 

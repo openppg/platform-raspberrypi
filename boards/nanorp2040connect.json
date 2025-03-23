@@ -37,7 +37,7 @@
   ],
   "name": "Arduino Nano RP2040 Connect",
   "upload": {
-    "maximum_ram_size": 270336,
+    "maximum_ram_size": 262144,
     "maximum_size": 2097152,
     "require_upload_port": true,
     "native_usb": true,
@@ -49,7 +49,8 @@
       "jlink",
       "raspberrypi-swd",
       "picotool",
-      "picoprobe"
+      "picoprobe",
+      "pico-debug"
     ]
   },
   "url": "https://blog.arduino.cc/2021/01/20/welcome-raspberry-pi-to-the-world-of-microcontrollers/",

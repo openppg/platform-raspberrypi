@@ -10,17 +10,19 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         example:
           - "examples/arduino-blink"
+          - "examples/arduino-ethernet-ota"
           - "examples/arduino-wifi-scan"
           - "examples/arduino-ota"
           - "examples/arduino-signed-ota"
           - "examples/arduino-external-libs"
+          - "examples/picosdk-blink"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: "recursive"
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
       - name: Enable Long Paths
@@ -39,7 +41,11 @@ jobs:
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get install -y openssl
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install openssl
+            choco install wget unzip
+            wget "https://download.firedaemon.com/FireDaemon-OpenSSL/openssl-3.3.1.zip"
+            unzip openssl-3.3.1.zip
+            echo "${{ github.workspace }}\openssl-3.3.1\openssl-3\x64\bin" >> $GITHUB_PATH
+            openssl --version
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install openssl
           else

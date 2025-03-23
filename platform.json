@@ -18,11 +18,15 @@
     "type": "git",
     "url": "https://github.com/platformio/platform-raspberrypi.git"
   },
-  "version": "1.11.0",
+  "version": "1.15.0",
   "frameworks": {
     "arduino": {
       "package": "framework-arduino-mbed",
       "script": "builder/frameworks/arduino/arduino.py"
+    },
+    "picosdk": {
+      "package": "framework-picosdk",
+      "script": "builder/frameworks/picosdk.py"
     }
   },
   "packages": {
@@ -41,18 +45,25 @@
       "type": "framework",
       "optional": true,
       "owner": "platformio",
-      "version": "~4.0.10"
+      "version": "~4.2.1"
     },
     "framework-arduinopico": {
       "type": "framework",
       "optional": true,
       "owner": "earlephilhower",
-      "version": "https://github.com/earlephilhower/arduino-pico.git#fdc361aff9998b8e62ce86fe339c9ee23b720f7e"
+      "version": "https://github.com/earlephilhower/arduino-pico.git#6236d1f7c599adf20c5b3a479e7232e2678c4fe2"
     },
-    "tool-rp2040tools": {
-      "type": "uploader",
+    "framework-picosdk": {
+      "type": "framework",
+      "optional": true,
       "owner": "platformio",
-      "version": "~1.0.2"
+      "version": "https://github.com/maxgerhardt/pico-sdk.git"
+    },
+    "tool-picotool-rp2040-earlephilhower": {
+      "type": "uploader",
+      "optional": false,
+      "owner": "platformio",
+      "version": "https://github.com/maxgerhardt/picotool-dummy/archive/refs/heads/main.zip"
     },
     "tool-openocd-rp2040-earlephilhower": {
       "type": "uploader",

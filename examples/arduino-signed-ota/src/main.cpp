@@ -1,12 +1,25 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
+// Simple Signed OTA example
+// Released to the public domain by Earle Philhower, Aug 2022
+//
+// Note that the actual code of this is the same as the BasicOTA.  No user
+// code changes are needed, only the presence of public.key and private.key
+// in the sketch directory.  The core will automatically sign any binaries
+// and include the necessary code to verify signatures.  For more info
+// check the documentation
+//
+// After uploading this sketch, try uploading the SignedOTA-Blink sketch
+// All unsigned binaries, or binaries signed with a different private
+// key will fail to upload.
+
+#include <Arduino.h>
+#include <WiFi.h>
+#include <SimpleMDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include "Updater_Signing.h"
 
 #ifndef STASSID
-#define STASSID "YourSSID"
-#define STAPSK "YourPassword"
+#define STASSID "your-ssid"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -51,7 +64,7 @@ void setup() {
     Serial.println("\nEnd");
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    Serial.printf("Progress: %u%%\r\n", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
     Serial.printf("Error[%u]: ", error);

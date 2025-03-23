@@ -23,36 +23,68 @@ class RaspberrypiPlatform(PlatformBase):
     def is_embedded(self):
         return True
 
-    earle_toolchain = {
+    earle_toolchain_arm = {
         # Windows
-        "windows_amd64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/x86_64-w64-mingw32.arm-none-eabi-d04e724.240125.zip",
-        "windows_x86": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/i686-w64-mingw32.arm-none-eabi-d04e724.240125.zip",
+        "windows_amd64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-w64-mingw32.arm-none-eabi-8ec9d6f.240929.zip",
+        "windows_x86": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-w64-mingw32.arm-none-eabi-8ec9d6f.240929.zip",
         # No Windows ARM64 or ARM32 builds.
         # Linux
-        "linux_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/x86_64-linux-gnu.arm-none-eabi-028e019.240125.tar.gz",
-        "linux_i686": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/i686-linux-gnu.arm-none-eabi-d04e724.240125.tar.gz",
-        "linux_aarch64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/aarch64-linux-gnu.arm-none-eabi-d04e724.240125.tar.gz",
-        "linux_armv7l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/arm-linux-gnueabihf.arm-none-eabi-d04e724.240125.tar.gz",
-        "linux_armv6l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/arm-linux-gnueabihf.arm-none-eabi-d04e724.240125.tar.gz",
+        "linux_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-linux-gnu.arm-none-eabi-8ec9d6f.240929.tar.gz",
+        "linux_i686": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-linux-gnu.arm-none-eabi-8ec9d6f.240929.tar.gz",
+        "linux_aarch64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-linux-gnu.arm-none-eabi-8ec9d6f.240929.tar.gz",
+        "linux_armv7l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.arm-none-eabi-8ec9d6f.240929.tar.gz",
+        "linux_armv6l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.arm-none-eabi-8ec9d6f.240929.tar.gz",
         # Mac (Intel and ARM are separate)
-        "darwin_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/x86_64-apple-darwin20.4.arm-none-eabi-d04e724.240125.tar.gz",
-        "darwin_arm64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/aarch64-apple-darwin20.4.arm-none-eabi-d04e724.240127.tar.gz"
+        "darwin_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-apple-darwin20.4.arm-none-eabi-8ec9d6f.240929.tar.gz",
+        "darwin_arm64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-apple-darwin20.4.arm-none-eabi-8ec9d6f.240929.tar.gz"
+    }
+
+    earle_toolchain_riscv = {
+        # Windows
+        "windows_amd64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-w64-mingw32.riscv32-unknown-elf-8ec9d6f.240929.zip",
+        "windows_x86": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-w64-mingw32.riscv32-unknown-elf-8ec9d6f.240929.zip",
+        # No Windows ARM64 or ARM32 builds.
+        # Linux
+        "linux_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-linux-gnu.riscv32-unknown-elf-8ec9d6f.240929.tar.gz",
+        "linux_i686": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-linux-gnu.riscv32-unknown-elf-8ec9d6f.240929.tar.gz",
+        "linux_aarch64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-linux-gnu.riscv32-unknown-elf-8ec9d6f.240929.tar.gz",
+        "linux_armv7l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.riscv32-unknown-elf-8ec9d6f.240929.tar.gz",
+        "linux_armv6l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.riscv32-unknown-elf-8ec9d6f.240929.tar.gz",
+        # Mac (Intel and ARM are separate)
+        "darwin_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-apple-darwin20.4.riscv32-unknown-elf-8ec9d6f.240929.tar.gz",
+        "darwin_arm64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-apple-darwin20.4.riscv32-unknown-elf-8ec9d6f.240929.tar.gz"
     }
 
     earle_openocd = {
         # Windows
-        "windows_amd64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/x86_64-w64-mingw32.openocd-4d87f6dca.240125.zip",
-        "windows_x86": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/i686-w64-mingw32.openocd-4d87f6dca.240125.zip",
+        "windows_amd64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-w64-mingw32.openocd-ebec9504d.240929.zip",
+        "windows_x86": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-w64-mingw32.openocd-ebec9504d.240929.zip",
         # No Windows ARM64 or ARM32 builds.
         # Linux
-        "linux_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/x86_64-linux-gnu.openocd-4d87f6dca.240125.tar.gz",
-        "linux_i686": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/i686-linux-gnu.openocd-4d87f6dca.240125.tar.gz",
-        "linux_aarch64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/aarch64-linux-gnu.openocd-4d87f6dca.240125.tar.gz",
-        "linux_armv7l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/arm-linux-gnueabihf.openocd-4d87f6dca.240125.tar.gz",
-        "linux_armv6l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/arm-linux-gnueabihf.openocd-4d87f6dca.240125.tar.gz",
+        "linux_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-linux-gnu.openocd-ebec9504d.240929.tar.gz",
+        "linux_i686": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-linux-gnu.openocd-ebec9504d.240929.tar.gz",
+        "linux_aarch64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-linux-gnu.openocd-ebec9504d.240929.tar.gz",
+        "linux_armv7l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.openocd-ebec9504d.240929.tar.gz",
+        "linux_armv6l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.openocd-ebec9504d.240929.tar.gz",
         # Mac (Intel and ARM are separate)
-        "darwin_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/x86_64-apple-darwin20.4.openocd-4d87f6dca.240125.tar.gz",
-        "darwin_arm64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/2.2.0/aarch64-apple-darwin20.4.openocd-4d87f6dca.240127.tar.gz"
+        "darwin_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-apple-darwin20.4.openocd-ebec9504d.240929.tar.gz",
+        "darwin_arm64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-apple-darwin20.4.openocd-ebec9504d.240929.tar.gz"
+    }
+
+    earle_picotool = {
+        # Windows
+        "windows_amd64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-w64-mingw32.picotool-8a9af99.240929.zip",
+        "windows_x86": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-w64-mingw32.picotool-8a9af99.240929.zip",
+        # No Windows ARM64 or ARM32 builds.
+        # Linux
+        "linux_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-linux-gnu.picotool-8a9af99.240929.tar.gz",
+        "linux_i686": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/i686-linux-gnu.picotool-8a9af99.240929.tar.gz",
+        "linux_aarch64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-linux-gnu.picotool-8a9af99.240929.tar.gz",
+        "linux_armv7l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.picotool-8a9af99.240929.tar.gz",
+        "linux_armv6l": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/arm-linux-gnueabihf.picotool-8a9af99.240929.tar.gz",
+        # Mac (Intel and ARM are separate)
+        "darwin_x86_64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/x86_64-apple-darwin20.4.picotool-8a9af99.240929.tar.gz",
+        "darwin_arm64": "https://github.com/earlephilhower/pico-quick-toolchain/releases/download/4.0.1/aarch64-apple-darwin20.4.picotool-8a9af99.240929.tar.gz"
     }
 
     def configure_default_packages(self, variables, targets):
@@ -61,6 +93,7 @@ class RaspberrypiPlatform(PlatformBase):
         # select the right one based on the build.core, disable other one.
         board = variables.get("board")
         board_config = self.board_config(board)
+        chip = variables.get("board_build.mcu", board_config.get("build.mcu"))
         build_core = variables.get(
             "board_build.core", board_config.get("build.core", "arduino"))
         # Use the same string identifier as seen in "pio system info" and registry
@@ -70,6 +103,9 @@ class RaspberrypiPlatform(PlatformBase):
         openocd_pkg = "tool-openocd-rp2040-earlephilhower"
         if openocd_pkg in self.packages:
             self.packages[openocd_pkg]["version"] = RaspberrypiPlatform.earle_openocd[sys_type]
+        picotool_pkg = "tool-picotool-rp2040-earlephilhower"
+        if picotool_pkg in self.packages:
+            self.packages[picotool_pkg]["version"] = RaspberrypiPlatform.earle_picotool[sys_type]
         if "arduino" in frameworks:
             if build_core == "arduino":
                 self.frameworks["arduino"]["package"] = "framework-arduino-mbed"
@@ -82,7 +118,12 @@ class RaspberrypiPlatform(PlatformBase):
                 self.packages.pop("toolchain-gccarmnoneeabi", None)
                 self.packages["toolchain-rp2040-earlephilhower"]["optional"] = False
                 # Configure toolchain download link dynamically
-                self.packages["toolchain-rp2040-earlephilhower"]["version"] = RaspberrypiPlatform.earle_toolchain[sys_type]
+                # RP2350 (RISC-V)
+                if chip == "rp2350-riscv":
+                    self.packages["toolchain-rp2040-earlephilhower"]["version"] = RaspberrypiPlatform.earle_toolchain_riscv[sys_type]
+                # RP2040, RP2350 (ARM)
+                else:
+                    self.packages["toolchain-rp2040-earlephilhower"]["version"] = RaspberrypiPlatform.earle_toolchain_arm[sys_type]
             else:
                 sys.stderr.write(
                     "Error! Unknown build.core value '%s'. Don't know which Arduino core package to use." % build_core)
@@ -175,7 +216,7 @@ class RaspberrypiPlatform(PlatformBase):
                         "package": "tool-openocd-rp2040-earlephilhower",
                         "arguments": [
                             "-s", "$PACKAGE_DIR/share/openocd/scripts",
-                            "-f", "interface/%s.cfg" % link,
+                            "-f", "interface/%s.cfg" % ("cmsis-dap" if link == "picoprobe" else link),
                             "-f", "target/%s" % openocd_target
                         ]
                     }
@@ -185,9 +226,22 @@ class RaspberrypiPlatform(PlatformBase):
         return board
 
     def configure_debug_session(self, debug_config):
+        is_riscv = False
+        if "board_build.mcu" in debug_config.env_options:
+            is_riscv = debug_config.env_options["board_build.mcu"] == "rp2350-riscv"
         adapter_speed = debug_config.speed or "1000"
         server_options = debug_config.server or {}
-        server_arguments = server_options.get("arguments", [])
+        server_arguments:list[str] = server_options.get("arguments", [])
+        # This is ugly but the only way I found this to be working.
+        # We need to give OpenOCD the rp2350-riscv.cfg config if we're in RISC-V mode
+        # (set dynamically by board_build.mcu = rp2350-riscv in the platformio.ini of the project)
+        # Somehow that can not yet be determined when we're inside _add_default_debug_tools(),
+        # So we have to patch this up afterwards.
+        if is_riscv:
+            try:
+                server_arguments[server_arguments.index("target/rp2350.cfg")] = "target/rp2350-riscv.cfg"
+            except:
+                pass
         if "interface/cmsis-dap.cfg" in server_arguments or "interface/picoprobe.cfg" in server_arguments:
             server_arguments.extend(
                 ["-c", "adapter speed %s" % adapter_speed]

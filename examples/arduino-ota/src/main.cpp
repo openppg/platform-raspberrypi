@@ -1,12 +1,11 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
+#include <WiFi.h>
+#include <SimpleMDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include "Updater_Signing.h"
 
 #ifndef STASSID
-#define STASSID "YourSSID"
-#define STAPSK "YourPassword"
+#define STASSID "your-ssid"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -23,11 +22,11 @@ void setup() {
     rp2040.restart();
   }
 
-  // Port defaults to 8266
-  // ArduinoOTA.setPort(8266);
+  // Port defaults to 2040
+  // ArduinoOTA.setPort(2040);
 
-  // Hostname defaults to esp8266-[ChipID]
-  // ArduinoOTA.setHostname("myesp8266");
+  // Hostname defaults to pico-[ChipID]
+  // ArduinoOTA.setHostname("mypico");
 
   // No authentication by default
   // ArduinoOTA.setPassword("admin");
